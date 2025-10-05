@@ -17,6 +17,6 @@ Incluye login con validaciones, catálogo de productos, carrito de compras y per
 - Navigation Compose
 
 
-#Nota: El archivo local.properties no se incluye porque es propio de cada computador (guarda la ruta del SDK de Android). Cambiar manualmente si no se hace de forma automatica.
+#Nota: En caso de que no corra, el archivo local.properties no se incluye porque es propio de cada computador (guarda la ruta del SDK de Android). Cambiar manualmente si no se hace de forma automatica.
 
 sdk.dir=C:\\Users\\TuUsuario\\AppData\\Local\\Android\\Sdk
