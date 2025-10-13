@@ -92,8 +92,8 @@ fun EcoNavGraph(
 
                 // --- Búsqueda y Perfil (como antes) ---
                 composable(Routes.SEARCH) { SearchScreen() }
-                composable(Routes.PROFILE) { ProfileScreen()
-                    ProfileScreen(viewModel())
+                composable(Routes.PROFILE) {
+                    ProfileScreen(navController=navController)
                 }
 
                 // --- Carrito ---
