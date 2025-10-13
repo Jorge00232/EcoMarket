@@ -14,6 +14,7 @@ class EcoApp : Application() {
         // Semilla de productos demo
         CoroutineScope(Dispatchers.IO).launch {
             Graph.repository.ensureSeed()
+            Graph.repository.ensureUsersSeed()
         }
     }
 }
