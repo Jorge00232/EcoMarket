@@ -92,7 +92,9 @@ fun EcoNavGraph(
 
                 // --- Búsqueda y Perfil (como antes) ---
                 composable(Routes.SEARCH) { SearchScreen() }
-                composable(Routes.PROFILE) { ProfileScreen() }
+                composable(Routes.PROFILE) { ProfileScreen()
+                    ProfileScreen(viewModel())
+                }
 
                 // --- Carrito ---
                 composable(Routes.CART) {

@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Declara que la cámara es una característica del hardware. Esto ayuda a Google Play Store a no mostrar tu app en dispositivos que no tienen cámara.-->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".EcoApp"
