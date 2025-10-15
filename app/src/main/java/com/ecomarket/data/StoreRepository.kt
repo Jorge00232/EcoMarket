@@ -75,4 +75,21 @@ class StoreRepository(
             )
         }
     }
+
+    // --- Funciones CRUD para Productos (Admin) ---
+    suspend fun getProductById(id: String): ProductEntity? {
+        return productDao.getProductById(id)
+    }
+
+    suspend fun addProduct(product: ProductEntity) {
+        productDao.insert(product)
+    }
+
+    suspend fun updateProduct(product: ProductEntity) {
+        productDao.update(product)
+    }
+
+    suspend fun deleteProduct(product: ProductEntity) {
+        productDao.delete(product)
+    }
 }

@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.ecomarket.admin.ProductEditScreen
 import com.ecomarket.cart.CartViewModel
 import com.ecomarket.store.StoreViewModel
 import com.ecomarket.ui.screens.CartScreen
@@ -33,6 +34,8 @@ object Routes {
     const val CART = "cart"
     const val PRODUCT_DETAIL = "product/{id}"
     fun productDetail(id: String) = "product/$id"
+    const val PRODUCT_EDIT = "product_edit/{id}"
+    fun productEdit(id: String) = "product_edit/$id"
 }
 
 @Composable
@@ -84,6 +87,7 @@ fun EcoNavGraph(
                     ProductListScreen(
                         onOpenProduct = { id -> navController.navigate(Routes.productDetail(id)) },
                         onOpenCart = { navController.navigate(Routes.CART) },
+                        navController = navController,
                         storeVm = storeVm,
                         cartVm = cartVm
                     )
@@ -116,6 +120,16 @@ fun EcoNavGraph(
                         onGoToCart = { navController.navigate(Routes.CART) },
                         storeVm = storeVm,
                         cartVm = cartVm
+                    )
+                }
+                composable(
+                    route = Routes.PRODUCT_EDIT,
+                    arguments = listOf(navArgument("id") { type = NavType.StringType })
+                ) { backStack ->
+                    val id = backStack.arguments?.getString("id").orEmpty()
+                    ProductEditScreen(
+                        productId = id,
+                        navController = navController
                     )
                 }
             }
