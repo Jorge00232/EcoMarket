@@ -97,7 +97,14 @@ fun LoginScreen(
         )
 
         Spacer(Modifier.height(20.dp))
-
+        if (ui.generalError != null) {
+            Text(
+                text = ui.generalError,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(Modifier.height(8.dp))
+        }
         Button(
             onClick = { vm.submit(onSuccess = onLoginSuccess) },
             enabled = ui.isValid && !ui.isLoading,

@@ -2,10 +2,13 @@ package com.ecomarket.data
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-
+import com.ecomarket.data.user.UserDao
+import com.ecomarket.data.user.UserEntity
+import com.ecomarket.data.user.UserRole
 class StoreRepository(
     private val productDao: ProductDao,
-    private val cartDao: CartDao
+    private val cartDao: CartDao,
+    private val userDao: UserDao
 ) {
     // Productos
     fun observeProducts(): Flow<List<ProductEntity>> = productDao.getAll()
@@ -38,4 +41,55 @@ class StoreRepository(
 
     suspend fun remove(productId: String) = cartDao.remove(productId)
     suspend fun clearCart() = cartDao.clear()
+
+    // Usuario
+    suspend fun findUserByEmail(email: String): UserEntity? {
+        return userDao.findByEmail(email)
+    }
+
+    suspend fun updateUser(user: UserEntity) {
+        userDao.update(user)
+    }
+    // Función para crear usuarios de prueba si no existen
+    suspend fun ensureUsersSeed() {
+        if (userDao.findByEmail("admin@ecomarket.cl") == null) {
+            userDao.insert(
+                UserEntity(
+                    email = "admin@ecomarket.cl",
+                    passHash = "admin123", // Simulación, en un proyecto real esto debe ser un hash!
+                    role = UserRole.ADMIN,
+                    name = "Admin EcoMarket"
+                )
+            )
+        }
+        if (userDao.findByEmail("cliente@ecomarket.cl") == null) {
+            userDao.insert(
+                UserEntity(
+                    email = "cliente@ecomarket.cl",
+                    passHash = "cliente123",
+                    role = UserRole.CUSTOMER,
+                    name = "Juan Cliente",
+                    birthDate = "1995-05-20",
+                    shippingAddress = "Av. Siempre Viva 742"
+                )
+            )
+        }
+    }
+
+    // --- Funciones CRUD para Productos (Admin) ---
+    suspend fun getProductById(id: String): ProductEntity? {
+        return productDao.getProductById(id)
+    }
+
+    suspend fun addProduct(product: ProductEntity) {
+        productDao.insert(product)
+    }
+
+    suspend fun updateProduct(product: ProductEntity) {
+        productDao.update(product)
+    }
+
+    suspend fun deleteProduct(product: ProductEntity) {
+        productDao.delete(product)
+    }
 }
