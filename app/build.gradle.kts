@@ -2,7 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
-    id("com.google.devtools.ksp") // 👈
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -77,10 +77,10 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
-// 👉 para LazyVerticalGrid
+//  para LazyVerticalGrid
     implementation("androidx.compose.foundation:foundation")
 
-// 👉 para AsyncImage
+//  para AsyncImage
     implementation("io.coil-kt:coil-compose:2.6.0")
 
 

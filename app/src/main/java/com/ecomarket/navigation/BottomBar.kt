@@ -23,9 +23,9 @@ data class BottomDestination(
 
 private val bottomDestinations = listOf(
     BottomDestination(Routes.HOME, "Inicio", Icons.Filled.Home),
-    BottomDestination(Routes.SEARCH, "Buscar", Icons.Filled.Search),
     BottomDestination(Routes.PROFILE, "Perfil", Icons.Filled.Person)
 )
+
 
 @Composable
 fun BottomBar(navController: NavHostController) {

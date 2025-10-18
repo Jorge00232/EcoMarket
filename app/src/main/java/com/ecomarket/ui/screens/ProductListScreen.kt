@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImage
 import com.ecomarket.cart.CartViewModel
+import com.ecomarket.data.Categories
 import com.ecomarket.data.ProductEntity
 import com.ecomarket.data.user.UserRole
 import com.ecomarket.di.Graph
@@ -33,41 +34,41 @@ import kotlinx.coroutines.launch
 fun ProductListScreen(
     onOpenProduct: (String) -> Unit,
     onOpenCart: () -> Unit,
-    navController: androidx.navigation.NavController, // Necesario para navegar
+    navController: androidx.navigation.NavController,
     storeVm: StoreViewModel,
     cartVm: CartViewModel
 ) {
     val all by storeVm.products.collectAsState()
-    val categories = listOf("Todos") + all.map { it.category }.distinct()
-    val userRole = Graph.loggedInUser?.role // Obtenemos el rol del usuario logueado
+    val userRole = Graph.loggedInUser?.role
 
     var query by remember { mutableStateOf("") }
     var selectedCat by remember { mutableStateOf("Todos") }
+
+    // Catálogo fijo para los chips
+    val catOptions = remember { listOf("Todos") + Categories.all }
 
     val filtered = all.filter { p ->
         (selectedCat == "Todos" || p.category == selectedCat) &&
                 (query.isBlank() || p.name.contains(query, ignoreCase = true))
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(if (userRole == UserRole.ADMIN) "Panel de Admin" else "EcoMarket") },
-                actions = {
-                    IconButton(onClick = onOpenCart) {
-                        Icon(imageVector = Icons.Filled.AddShoppingCart, contentDescription = "Carrito")
-                    }
-                }
+                actions = { IconButton(onClick = onOpenCart) { Icon(Icons.Filled.AddShoppingCart, contentDescription = "Carrito") } }
             )
         },
-        // AÑADIMOS EL BOTÓN FLOTANTE PARA EL ADMIN
         floatingActionButton = {
             if (userRole == UserRole.ADMIN) {
                 FloatingActionButton(onClick = { navController.navigate(Routes.productEdit("new")) }) {
                     Icon(Icons.Default.Add, contentDescription = "Añadir Producto")
                 }
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { inner ->
         Column(
             modifier = Modifier
@@ -75,11 +76,20 @@ fun ProductListScreen(
                 .fillMaxSize()
                 .padding(12.dp)
         ) {
-            // ... (El TextField, los Chips de categoría y los Spacers se quedan igual) ...
-            OutlinedTextField(value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(), placeholder = { Text("Busca productos…") }, singleLine = true)
+            OutlinedTextField(
+                value = query, onValueChange = { query = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Busca productos…") }, singleLine = true
+            )
             Spacer(Modifier.height(8.dp))
-            Row(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(vertical = 4.dp)) {
-                categories.forEach { cat -> AssistChip(onClick = { selectedCat = cat }, label = { Text(cat) }, modifier = Modifier.padding(end = 8.dp)) }
+            Row(Modifier.horizontalScroll(rememberScrollState()).padding(vertical = 4.dp)) {
+                catOptions.forEach { cat ->
+                    AssistChip(
+                        onClick = { selectedCat = cat },
+                        label = { Text(cat) },
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
             }
             Spacer(Modifier.height(8.dp))
 
@@ -90,14 +100,34 @@ fun ProductListScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(filtered, key = { it.id }) { product ->
+                    var showConfirm by remember { mutableStateOf(false) }
+
                     ProductCard(
                         product = product,
-                        userRole = userRole, // Pasamos el rol
+                        userRole = userRole,
                         onOpen = { onOpenProduct(product.id) },
                         onAdd = { cartVm.add(product.id) },
                         onEdit = { navController.navigate(Routes.productEdit(product.id)) },
-                        onDelete = { storeVm.viewModelScope.launch { Graph.repository.deleteProduct(product) } }
+                        onDelete = { showConfirm = true }
                     )
+
+                    if (showConfirm) {
+                        AlertDialog(
+                            onDismissRequest = { showConfirm = false },
+                            title = { Text("Eliminar producto") },
+                            text = { Text("¿Seguro que deseas eliminar \"${product.name}\"?") },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    showConfirm = false
+                                    storeVm.viewModelScope.launch {
+                                        Graph.repository.deleteProduct(product)
+                                        snackbarHostState.showSnackbar("Producto eliminado")
+                                    }
+                                }) { Text("Eliminar") }
+                            },
+                            dismissButton = { TextButton(onClick = { showConfirm = false }) { Text("Cancelar") } }
+                        )
+                    }
                 }
             }
         }
@@ -115,14 +145,12 @@ private fun ProductCard(
 ) {
     ElevatedCard(onClick = onOpen) {
         Column(Modifier.padding(10.dp)) {
-            // ... (La imagen, nombre y precio se quedan igual) ...
-            AsyncImage(model = product.imageUrl, contentDescription = product.name, modifier = Modifier.fillMaxWidth().height(110.dp))
+            AsyncImage(model = product.imageUrl, contentDescription = product.name,
+                modifier = Modifier.fillMaxWidth().height(110.dp))
             Spacer(Modifier.height(8.dp))
             Text(product.name, style = MaterialTheme.typography.titleSmall, maxLines = 2)
             Text(product.finalPrice().asCLP(), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(6.dp))
-
-            // MOSTRAMOS BOTONES DIFERENTES SEGÚN EL ROL
             if (userRole == UserRole.ADMIN) {
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     IconButton(onClick = onEdit, modifier = Modifier.weight(1f)) { Icon(Icons.Default.Edit, "Editar") }
@@ -131,8 +159,7 @@ private fun ProductCard(
             } else {
                 FilledTonalButton(onClick = onAdd, modifier = Modifier.fillMaxWidth()) {
                     Icon(Icons.Filled.AddShoppingCart, contentDescription = null)
-                    Spacer(Modifier.width(6.dp))
-                    Text("Agregar")
+                    Spacer(Modifier.width(6.dp)); Text("Agregar")
                 }
             }
         }

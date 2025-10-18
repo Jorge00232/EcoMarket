@@ -141,8 +141,8 @@ private fun NavDestination?.shouldShowBottomBar(): Boolean {
     val route = this?.route ?: return false
     return route in listOf(
         Routes.HOME,
-        Routes.SEARCH,
         Routes.PROFILE,
-        Routes.CART // mostramos la BottomBar también en Carrito
+        Routes.CART //BUTTOMBAR CARRITO
     )
 }
+
