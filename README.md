@@ -1,33 +1,87 @@
-# EcoMarket
-Aplicación móvil desarrollada en **Android Studio** con **Kotlin** y **Jetpack Compose**.  
-Incluye autenticación de usuarios, catálogo de productos, carrito de compras y un panel administrativo con CRUD.  
-La aplicación utiliza **Room (SQLite)** para la persistencia de datos y aplica animaciones suaves con las APIs de Compose.
+# 🛒 EcoMarket
 
-## Funcionalidades principales
-- Inicio de sesión con validaciones de correo y contraseña  
-- Navegación inferior (BottomBar) con secciones de Inicio y Perfil  
-- Catálogo de productos con imágenes, búsqueda y categorías fijas de alimentos  
-- Carrito de compras con totales dinámicos y datos persistentes  
-- Panel de administrador con funciones CRUD (crear, editar y eliminar productos)  
-- Validaciones en el formulario: campos obligatorios, precios numéricos y descuentos opcionales  
-- Retroalimentación visual mediante loaders, mensajes y animaciones  
+Aplicación móvil desarrollada en **Android Studio**, **Kotlin** y **Jetpack Compose**, con autenticación, catálogo de productos, carrito de compras y un panel administrativo CRUD.  
+La app utiliza **Room (SQLite)** para persistencia de datos y ahora integra una **API externa real** para obtener el tipo de cambio USD→CLP en tiempo real.
 
-## Tecnologías
-- **Kotlin**
-- **Jetpack Compose**
-- **Material 3**
-- **Navigation Compose**
-- **Room Database (SQLite)**
-- **Coil** (carga de imágenes)
-- **Compose Animation APIs**
+---
 
-## Nota
-PARA Probar CRUD: admin@ecomarket.cl --> admin123
+## 🚀 Funcionalidades principales
+- Inicio de sesión con validaciones  
+- Navegación mediante BottomBar (Inicio / Perfil)  
+- Catálogo con imágenes, buscador y categorías  
+- Carrito de compras persistente  
+- Panel de administrador con CRUD completo  
+- Validaciones de formularios (precios numéricos, campos requeridos, descuentos opcionales)  
+- Animaciones suaves con Jetpack Compose  
+- **Conversión de precios CLP → USD mediante API externa**
 
-De momento no hay validacion en el perfil, pero si en formularios de CRUD y el primer formulario de inicio de sesion.
+---
 
-En caso de que la aplicación no corra correctamente, el archivo `local.properties` no se incluye en el repositorio porque es propio de cada computador (contiene la ruta local del SDK de Android).  
-Debe generarse automáticamente al abrir el proyecto en Android Studio. Si no ocurre, créelo manualmente con la siguiente ruta:
+## 🌐 Integración con API externa (Tipo de cambio USD→CLP)
+
+EcoMarket consume un servicio público para obtener la tasa de cambio del dólar y mostrar precios aproximados en USD dentro del catálogo.
+
+### API utilizada
+**ExchangeRate API — open.er-api.com**
+
+### Base URL
+https://open.er-api.com/
+
+
+### Endpoint utilizado
+https://open.er-api.com//v6/latest/USD
+
+
+### Datos obtenidos
+- Se extrae el valor:
+rates["CLP"]
+
+- Ejemplo real: `CLP = 934.52`
+
+### Uso dentro de la app
+- El TopBar muestra:  
+**1 USD = 934 CLP**
+- Cada producto muestra también su precio estimado en USD  
+- La tasa se obtiene automáticamente al iniciar la app  
+- Logcat registra la operación bajo la etiqueta:  
+EcoMarketRate
+
+
+---
+
+## 🧱 Arquitectura de red (resumen)
+- **NetworkModule**: Configura Retrofit para el backend local + API externa  
+- **RateRepository**: Lógica para obtener el tipo de cambio  
+- **ProductListScreen**: Muestra la tasa en el TopBar y calcula el precio en USD  
+- **OkHttp Logging**: Permite depuración completa de solicitudes HTTP  
+
+---
+
+## 🛠 Tecnologías utilizadas
+- Kotlin  
+- Jetpack Compose  
+- Material 3  
+- Navigation Compose  
+- Room Database (SQLite)  
+- Retrofit + Moshi  
+- OkHttp Logging Interceptor  
+- Coil (carga de imágenes)  
+- Coroutines  
+- MVVM
+
+---
+
+## 🔑 Usuario administrador (para CRUD)
+admin@ecomarket.cl
+admin123
+
+
+---
+
+## ⚠ Nota sobre `local.properties`
+Este archivo **no viene incluido en el repositorio** porque depende de cada instalación.  
+Si Android Studio no lo genera, créalo manualmente:
 
 ```properties
 sdk.dir=C:\\Users\\TuUsuario\\AppData\\Local\\Android\\Sdk
+
