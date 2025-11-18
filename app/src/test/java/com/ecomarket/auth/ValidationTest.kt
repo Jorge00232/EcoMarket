@@ -12,7 +12,7 @@ class ValidationTest {
         val error = Validation.emailErrorOrNull(email)
 
         assertNotNull("El error no debería ser nulo", error)
-        assertEquals("Ingresa tu correo", error)
+        assertEquals("Ingresa tu correo***", error)
     }
 
     @Test

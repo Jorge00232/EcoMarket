@@ -6,7 +6,7 @@ private val EMAIL_REGEX =
 object Validation {
 
     fun emailErrorOrNull(email: String): String? {
-        if (email.isBlank()) return "Ingresa tu correo"
+        if (email.isBlank()) return "Ingresa tu correo***"
         if (!EMAIL_REGEX.matches(email)) return "Formato de correo no válido"
         return null
     }
