@@ -1,16 +1,21 @@
 package com.ecomarket.data
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import com.ecomarket.data.remote.dto.toDto
+import com.ecomarket.data.remote.dto.toEntity
 import com.ecomarket.data.user.UserDao
 import com.ecomarket.data.user.UserEntity
 import com.ecomarket.data.user.UserRole
+import com.ecomarket.di.Graph
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import java.lang.Exception
+
 class StoreRepository(
     private val productDao: ProductDao,
     private val cartDao: CartDao,
     private val userDao: UserDao
 ) {
-    // Productos
+    // Productos (se queda igual)
     fun observeProducts(): Flow<List<ProductEntity>> = productDao.getAll()
     fun observeProduct(id: String): Flow<ProductEntity?> = productDao.getById(id)
 
@@ -20,7 +25,7 @@ class StoreRepository(
         }
     }
 
-    // Carrito
+    // Carrito (se queda igual)
     fun observeCart(): Flow<List<CartLine>> = cartDao.observeCart()
     fun observeSubtotal(): Flow<Double> = cartDao.observeSubtotal().map { it ?: 0.0 }
 
@@ -42,7 +47,7 @@ class StoreRepository(
     suspend fun remove(productId: String) = cartDao.remove(productId)
     suspend fun clearCart() = cartDao.clear()
 
-    // Usuario
+    // Usuario (se queda igual)
     suspend fun findUserByEmail(email: String): UserEntity? {
         return userDao.findByEmail(email)
     }
@@ -81,15 +86,49 @@ class StoreRepository(
         return productDao.getProductById(id)
     }
 
+    // --- INICIO DE LA MODIFICACIÓN ---
+
     suspend fun addProduct(product: ProductEntity) {
-        productDao.insert(product)
+        // Obtenemos la API desde el Graph
+        val api = Graph.productsApi
+        try {
+            // 1. Convertimos la entidad local a un DTO y la enviamos al servidor
+            val createdDto = api.create(product.toDto())
+
+            // 2. Guardamos la respuesta del servidor (que tiene el ID correcto) en Room
+            productDao.insert(createdDto.toEntity())
+
+        } catch (e: Exception) {
+            // El ViewModel (ProductEditViewModel) tiene un try-catch,
+            // así que relanzamos la excepción para que pueda mostrar el error en la UI.
+            throw e
+        }
     }
 
     suspend fun updateProduct(product: ProductEntity) {
-        productDao.update(product)
+        val api = Graph.productsApi
+        try {
+            // 1. Enviamos la entidad actualizada a la API
+            val updatedDto = api.update(product.id, product.toDto())
+
+            // 2. Guardamos la respuesta actualizada en Room
+            productDao.update(updatedDto.toEntity())
+        } catch (e: Exception) {
+            throw e
+        }
     }
 
     suspend fun deleteProduct(product: ProductEntity) {
-        productDao.delete(product)
+        val api = Graph.productsApi
+        try {
+            // 1. Primero lo borramos de la API
+            api.delete(product.id)
+
+            // 2. Si la API tuvo éxito, lo borramos de Room
+            productDao.delete(product)
+        } catch (e: Exception) {
+            throw e
+        }
     }
+    // --- FIN DE LA MODIFICACIÓN ---
 }
