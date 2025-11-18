@@ -47,6 +47,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui-tooling-preview")
+    testImplementation(libs.junit.jupiter)
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     // --- Activity & Lifecycle ---
