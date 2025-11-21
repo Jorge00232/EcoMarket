@@ -1,5 +1,6 @@
 package com.ecomarket.ui.screens
 
+import androidx.compose.foundation.Image // <-- AÑADIR ESTE IMPORT
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size // <-- AÑADIR ESTE IMPORT
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -26,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource // <-- AÑADIR ESTE IMPORT
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -33,6 +36,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ecomarket.auth.LoginViewModel
+import com.ecomarket.R // <-- AÑADIR ESTE IMPORT (para acceder a tus drawables)
 
 @Composable
 fun LoginScreen(
@@ -49,10 +53,16 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("EcoMarket", style = MaterialTheme.typography.headlineMedium)
-        Text("Inicia sesión o entra como invitado", style = MaterialTheme.typography.bodyMedium)
+        Image(
+            painter = painterResource(id = R.drawable.logo_redondo),
+            contentDescription = "Logo de EcoMarket",
+            modifier = Modifier.size(180.dp) // Para ajustar el tamaño segun lo necesario
+        )
+        Spacer(Modifier.height(16.dp)) // Espacio entre el logo y el texto
 
-        Spacer(Modifier.height(24.dp))
+        Text("Inicia sesión o entra como invitado", style = MaterialTheme.typography.bodyLarge) // Texto un poco más grande
+
+        Spacer(Modifier.height(32.dp)) // Más espacio antes de los campos
 
         OutlinedTextField(
             value = ui.email,
@@ -68,7 +78,7 @@ fun LoginScreen(
             )
         )
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(16.dp)) // Más espacio entre campos
 
         OutlinedTextField(
             value = ui.password,
@@ -96,7 +106,7 @@ fun LoginScreen(
             )
         )
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(24.dp)) // Más espacio antes de los botones
         if (ui.generalError != null) {
             Text(
                 text = ui.generalError,
@@ -117,7 +127,7 @@ fun LoginScreen(
             }
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(16.dp)) // Más espacio entre botones
 
         ElevatedButton(
             onClick = { vm.loginAsGuest(onSuccess = onGuest) },
